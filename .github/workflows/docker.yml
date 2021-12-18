@@ -1,5 +1,5 @@
 name: docker
-on: [release]
+on: [release, create]
 jobs:
   build-and-push-docker:
     name: Build and push docker image
