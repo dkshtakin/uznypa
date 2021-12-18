@@ -12,7 +12,7 @@ commands = ['help']
 @bot.message_handler(commands='start')
 def send_greetings(message):
     """Sends greetings to users"""
-    bot.reply_to(message, "Привет!")
+    bot.reply_to(message, "Привет! Меня зовут Узныпа. Если возникли трудности - пиши /help")
 
 
 @bot.message_handler(commands=commands[0])
