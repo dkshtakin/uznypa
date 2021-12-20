@@ -6,7 +6,9 @@ import telebot
 from saving import load_list, save_list, load_value, save_value
 
 COMMANDS = ['help', 'set', 'reset']
-COMMANDS_DESCRIPTION = {'help': 'Справка', 'reset': 'Узныпа забудет все, что вы ему писали. Все настройки также будут установлены по умолчанию'}
+COMMANDS_DESCRIPTION = {'help': 'Справка',
+                        'reset': 'Узныпа забудет все, что вы ему писали.'
+                        ' Все настройки также будут установлены по умолчанию'}
 DEFAULT_CONFIG = {'reply_chance': 60, 'max_lines_number': 200, 'max_str_size': 25}
 DEFAULT_CONFIG_MIN = {'reply_chance': 0, 'max_lines_number': 1, 'max_str_size': 1}
 DEFAULT_CONFIG_MAX = {'reply_chance': 100, 'max_lines_number': 1000, 'max_str_size': 100}
@@ -69,12 +71,12 @@ def set_config(message):
     if tokens[1] == 'default' and len(tokens) == 2:
         save_value(cfg_filename, DEFAULT_CONFIG)
         bot.send_message(message.chat.id, 'Установлены значения по умолчанию')
-    elif tokens[1] in DEFAULT_CONFIG.keys() and len(tokens) == 3 and tokens[2].isdigit():
+    elif tokens[1] in DEFAULT_CONFIG and len(tokens) == 3 and tokens[2].isdigit():
         tokens[2] = int(tokens[2])
         if tokens[2] < DEFAULT_CONFIG_MIN[tokens[1]] or tokens[2] > DEFAULT_CONFIG_MAX[tokens[1]]:
             bot.send_message(message.chat.id,
-                             'Ошибка! Допустимые значения от ' + 
-                             str(DEFAULT_CONFIG_MIN[tokens[1]]) + 
+                             'Ошибка! Допустимые значения от ' +
+                             str(DEFAULT_CONFIG_MIN[tokens[1]]) +
                              ' до ' + str(DEFAULT_CONFIG_MAX[tokens[1]]))
             return
         config = load_value(cfg_filename)
@@ -88,7 +90,8 @@ def set_config(message):
 @bot.message_handler(commands=COMMANDS[2])
 def reset(message):
     """Resets config and clears all saved data"""
-    if bot.get_chat_member(message.chat.id,message.from_user.id).status in ['administrator','creator'] or message.chat.type == 'private':
+    status = bot.get_chat_member(message.chat.id, message.from_user.id).status
+    if status in ['administrator', 'creator'] or message.chat.type == 'private':
         cfg_filename = CFG_PATH + str(message.chat.id)
         data_filename = DATA_PATH + str(message.chat.id)
         size_filename = SIZE_PATH + str(message.chat.id)
@@ -98,7 +101,7 @@ def reset(message):
         bot.send_message(message.chat.id, 'Все данные успешно удалены')
     else:
         bot.send_message(message.chat.id, 'Ошибка! Эта команда доступна только админам беседы')
-    
+
 
 @bot.message_handler(func=lambda m: True)
 def echo_all(message):
@@ -129,7 +132,8 @@ def echo_all(message):
     else:
         save_list(data_filename, msg)
     save_value(size_filename, size)
-    if random.random() <= load_value(cfg_filename)['reply_chance'] / 100 or message.text.split()[0].lower() == 'узныпа':
+    if random.random() <= load_value(cfg_filename)['reply_chance'] / 100 \
+       or message.text.split()[0].lower() == 'узныпа':
         if not data:
             data = load_list(data_filename)
         bot.send_message(message.chat.id, random.choice(data))

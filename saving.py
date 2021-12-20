@@ -1,8 +1,10 @@
+"""module for pickle serialization and deserialization"""
 import os
 import pickle
 
 
 def load_list(filename):
+    """Deserialize a list"""
     data_list = []
     if not os.path.isfile(filename):
         return data_list
@@ -15,12 +17,14 @@ def load_list(filename):
 
 
 def save_list(filename, data_list, overwrite=False):
+    """Serialize a list"""
     mode = 'wb' if overwrite else 'ab'
     with open(filename, mode) as file:
         pickle.dump(data_list, file)
 
 
 def load_value(filename):
+    """Deserialize some value"""
     if not os.path.isfile(filename):
         return 0
     with open(filename, "rb") as file:
@@ -28,5 +32,6 @@ def load_value(filename):
 
 
 def save_value(filename, value):
+    """Serialize some value"""
     with open(filename, "wb") as file:
         pickle.dump(value, file)
