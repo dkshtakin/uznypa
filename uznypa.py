@@ -150,7 +150,6 @@ def echo_all(message):
 @bot.message_handler(func=lambda m: m.caption == '/dem', content_types = ["photo"])
 def reply_to_photo(message):
     """Sends some photo"""
-    # sudo apt-get install msttcorefonts
     photo_path = bot.get_file(message.photo[len(message.photo) - 1].file_id).file_path
     photo = bot.download_file(photo_path)
     filename = 'photo' + message.photo[1].file_id
