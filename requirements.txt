@@ -1,1 +1,2 @@
 pyTelegramBotAPI==4.2.2
+https://github.com/Infqq/simpledemotivators/archive/main.zip

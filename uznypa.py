@@ -3,12 +3,15 @@ import os
 import random
 import textwrap
 import telebot
+from simpledemotivators import Demotivator
 from saving import load_list, save_list, load_value, save_value
 
-COMMANDS = ['help', 'set', 'reset']
+
+COMMANDS = ['help', 'set', 'reset', 'dem']
 COMMANDS_DESCRIPTION = {'help': 'Справка',
                         'reset': 'Узныпа забудет все, что вы ему писали.'
-                        ' Все настройки также будут установлены по умолчанию'}
+                        ' Все настройки также будут установлены по умолчанию',
+                        'dem': 'Сделать демотиватор из прикрепленной картинки'}
 DEFAULT_CONFIG = {'reply_chance': 60, 'max_lines_number': 200, 'max_str_size': 25}
 DEFAULT_CONFIG_MIN = {'reply_chance': 0, 'max_lines_number': 1, 'max_str_size': 1}
 DEFAULT_CONFIG_MAX = {'reply_chance': 100, 'max_lines_number': 1000, 'max_str_size': 100}
@@ -103,6 +106,12 @@ def reset(message):
         bot.send_message(message.chat.id, 'Ошибка! Эта команда доступна только админам беседы')
 
 
+@bot.message_handler(commands=COMMANDS[3])
+def dem_without_photo(message):
+    """Sends error message about photo"""
+    bot.send_message(message.chat.id, 'Ошибка! Отсутствует изображение')
+
+
 @bot.message_handler(func=lambda m: True)
 def echo_all(message):
     """
@@ -137,6 +146,27 @@ def echo_all(message):
         if not data:
             data = load_list(data_filename)
         bot.send_message(message.chat.id, random.choice(data))
+
+
+@bot.message_handler(func=lambda m: m.caption == '/dem', content_types = ["photo"])
+def reply_to_photo(message):
+    """Sends some photo"""
+    # sudo apt-get install msttcorefonts
+    photo_path = bot.get_file(message.photo[len(message.photo) - 1].file_id).file_path
+    photo = bot.download_file(photo_path)
+    filename = 'photo' + message.photo[1].file_id
+    with open(filename, 'wb') as file:
+        file.write(photo)
+    data_filename = DATA_PATH + str(message.chat.id)
+    data = load_list(data_filename)
+    dem = Demotivator(random.choice(data))
+    result = 'dem' + message.photo[1].file_id + '.jpg'
+    dem.create(filename, watermark='@uznypa_bot', result_filename=result)
+    data = load_list(data_filename)
+    with open(result, 'rb') as file:
+        bot.send_photo(message.chat.id, file)
+    os.remove(filename)
+    os.remove(result)
 
 
 bot.infinity_polling()
