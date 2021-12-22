@@ -19,6 +19,7 @@ PICKLE_PATH = 'pickle/'
 CFG_PATH = 'pickle/cfg/'
 DATA_PATH = 'pickle/data/'
 SIZE_PATH = 'pickle/size/'
+UPDATED = False
 
 if not os.path.exists(PICKLE_PATH):
     os.mkdir(PICKLE_PATH)
@@ -32,7 +33,6 @@ if not os.path.exists(SIZE_PATH):
 token = os.getenv("TOKEN")
 print("token: ", token)
 bot = telebot.TeleBot(token, parse_mode=None)
-
 
 @bot.message_handler(commands='start')
 def send_greetings(message):
@@ -129,7 +129,6 @@ def echo_all(message):
         msg = textwrap.wrap(msg, config['max_str_size'])
     else:
         msg = [msg]
-    print(load_value(size_filename))
     size = load_value(size_filename) + len(msg)
     data = []
     if size >= config['max_lines_number'] * 2:
@@ -159,7 +158,15 @@ def reply_to_photo(message):
         file.write(photo)
     data_filename = DATA_PATH + str(message.chat.id)
     data = load_list(data_filename)
-    dem = Demotivator(random.choice(data))
+    line1 = ''
+    line2 = ''
+    if data:
+        line1 = random.choice(data)
+        line2 = random.choice(data)
+    else:
+        line1 = '...'
+        line2 = '...'
+    dem = Demotivator(line1, line2)
     result = 'dem' + message.photo[1].file_id + '.jpg'
     dem.create(filename, watermark='@uznypa_bot', result_filename=result)
     data = load_list(data_filename)
