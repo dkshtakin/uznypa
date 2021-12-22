@@ -7,6 +7,7 @@ RUN pip3 install -r requirements.txt
 
 COPY . .
 
-RUN apt-get install -y ttf-mscorefonts-installer fontconfig
+RUN sed -i'.bak' 's/$/ contrib/' /etc/apt/sources.list
+RUN apt-get update; apt-get install -y ttf-mscorefonts-installer fontconfig
 
 CMD [ "python3", "uznypa.py", "--host=0.0.0.0"]
